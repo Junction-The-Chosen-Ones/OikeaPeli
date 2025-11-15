@@ -6,7 +6,7 @@ public class CardManager : MonoBehaviour
     public List<card> cards = new List<card>{ };
     public int[] hand = new int[6] {0,0,0,0,0,0};
     public int[] cardpool = new int[] { 1, 2, 3 };
-    public GameObject[] cardobjects;
+    public UIHandler uihandler;
     GameObject UICanvas;
 
     public enum actionType
@@ -54,7 +54,57 @@ public class CardManager : MonoBehaviour
 
     }
 
-    void AddCardToHand(int kortti)
+    public void CardProq(int card)
+    {
+        gameObject.GetComponentInChildren<PlayerStats>().HPHandling(cards[card].cost*-1); 
+        for(int i = 0; i < cards[i].actiontype.Length; i++)
+        {
+            switch (cards[card].actiontype[i])
+            {
+                case actionType.attack:
+                    gameObject.GetComponentInChildren<Enemy>().HPHandling(cards[card].amount[i]*-1);
+                    Debug.Log(cards[card].amount[i] * -1);
+                    break;
+                case actionType.special:
+                    gameObject.GetComponentInChildren<Enemy>().HPHandling(-cards[card].amount[i] * -1);
+                    Debug.Log(cards[card].amount[i] * -1);
+                    break;
+                case actionType.defend:
+                    gameObject.GetComponentInChildren<PlayerStats>().Shield += (cards[card].amount[i]);
+                    gameObject.GetComponentInChildren<PlayerStats>().UpdateText();
+                    break;
+                case actionType.heal:
+                    gameObject.GetComponentInChildren<PlayerStats>().HPHandling(cards[card].amount[i]);
+                    break;
+            }
+        }
+    }
+
+    public void EnemyCardProq(int card)
+    {
+        for (int i = 0; i < cards[i].actiontype.Length; i++)
+        {
+            switch (cards[card].actiontype[i])
+            {
+                case actionType.attack:
+                    gameObject.GetComponentInChildren<PlayerStats>().HPHandling(cards[card].amount[i]*-1);
+                    Debug.Log(cards[card].amount[i] * -1);
+                    break;
+                case actionType.special:
+                    gameObject.GetComponentInChildren<PlayerStats>().HPHandling(cards[card].amount[i] * -1);
+                    Debug.Log(cards[card].amount[i] * -1);
+                    break;
+                case actionType.defend:
+                    gameObject.GetComponentInChildren<Enemy>().Shield += (cards[card].amount[i]);
+                    break;
+                case actionType.heal:
+                    gameObject.GetComponentInChildren<Enemy>().HPHandling(cards[card].amount[i]);
+                    break;
+            }
+        }
+    }
+
+    public void AddCardToHand(int kortti)
     {
         for (int i = 0; i < 6; i++)
         {
@@ -66,10 +116,22 @@ public class CardManager : MonoBehaviour
         }
         UpdateCardVisual();
     }
-    void AddCardToHand()
+
+    public void RemoveCardFromHand(int index)
     {
-        for(int i = 0; i < 6; i++) {
-        if(hand[i] == 0) {
+        hand[index] = 0;
+        uihandler.cardobjects[index].GetComponent<HoverAndSelection>().hover = false;
+        uihandler.cardobjects[index].GetComponent<CardVisual>().selected = false;
+        uihandler.cardobjects[index].GetComponent<CardVisual>().trans.anchoredPosition = new Vector2(uihandler.cardobjects[index].GetComponent<CardVisual>().trans.anchoredPosition.x, 182);
+        UpdateCardVisual();
+    }
+
+    public void AddCardToHand()
+    {
+        for(int i = 0; i < 6; i++)
+        {
+            if(hand[i] == 0)
+            {
                 hand[i] = cardpool[Random.Range(1, cardpool.Length)];
                 break;
             }
@@ -90,16 +152,16 @@ public class CardManager : MonoBehaviour
 
     void UpdateCardVisual()
     {
-        for(int i = 0; i < cardobjects.Length; i++)
+        for(int i = 0; i < uihandler.cardobjects.Length; i++)
         {
             if(hand[i] == 0)
             {
                 
-                cardobjects[i].SetActive(false);
+                uihandler.cardobjects[i].SetActive(false);
             }
             else {
-                cardobjects[i].SetActive(true);
-                cardobjects[i].GetComponent<CardVisual>().set(cards[hand[i]].name, cards[hand[i]].desc, cards[hand[i]].cost.ToString());
+                uihandler.cardobjects[i].SetActive(true);
+                uihandler.cardobjects[i].GetComponent<CardVisual>().set(cards[hand[i]].name, cards[hand[i]].desc, cards[hand[i]].cost.ToString());
             }
         }
     }

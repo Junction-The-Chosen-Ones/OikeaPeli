@@ -1,14 +1,17 @@
 using UnityEngine;
+using TMPro;
 
 public class PlayerStats : MonoBehaviour
 {
     int MaxHP = 50;
     int CurHP = 50;
+    public int Shield = 0;
     int Strength = 0;
     int Endurance = 0;
+    [SerializeField]
+    TMP_Text text;
 
-
-    void HPHandling(int change) {
+    public void HPHandling(int change) {
         CurHP += change;
         if(CurHP > MaxHP)
         {
@@ -17,9 +20,10 @@ public class PlayerStats : MonoBehaviour
         {
             Death();
         }
+        UpdateText();
     }
 
-    void StrengthHandling(int change)
+    public void StrengthHandling(int change)
     {
         Strength += change;
         if (Strength > 5)
@@ -30,9 +34,10 @@ public class PlayerStats : MonoBehaviour
         {
             Strength = -5;
         }
+        UpdateText();
     }
 
-    void EndurancehHandling(int change)
+    public void EndurancehHandling(int change)
     {
         Endurance += change;
         if (Endurance > 5)
@@ -43,6 +48,13 @@ public class PlayerStats : MonoBehaviour
         {
             Endurance = -5;
         }
+        UpdateText();
+    }
+
+    public void UpdateText() {
+
+        text.text = "Health: " + CurHP.ToString()+"/"+MaxHP.ToString() + "   Shield: " + Shield.ToString() + "   Strength: " + Strength.ToString() + "   Endurance: " + Endurance.ToString(); 
+
     }
 
     private void Update()
@@ -52,6 +64,16 @@ public class PlayerStats : MonoBehaviour
     void Death()
     {
         
+    }
+
+    void battlestart()
+    {
+
+    }
+
+    private void Start()
+    {
+        UpdateText();
     }
 
 }
