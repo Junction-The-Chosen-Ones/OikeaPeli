@@ -8,16 +8,31 @@ public class CardManager : MonoBehaviour
     public int[] cardpool = new int[] { 1, 2, 3 };
     public GameObject[] cardobjects;
     GameObject UICanvas;
+
+    public enum actionType
+    {
+        attack = 0,
+        defend = 1,
+        heal = 2,
+        special = 3,
+    }
+    public enum DamageType
+    {
+        physical = 0,
+        elemental = 1,
+        holy = 2,
+        dark = 3
+    }
     public class card
     {
         public string name;
         public string desc;
         public int cost;
-        public int[] actiontype;
-        public int[] damagetype;
+        public actionType[] actiontype;
+        public DamageType[] damagetype;
         public int[] amount;
         
-        public card(string namec, string descc, int costc, int[] actiontypec, int[] amountc, int[] damagetypec)
+        public card(string namec, string descc, int costc, actionType[] actiontypec, DamageType[] damagetypec, int[] amountc)
         {
             this.name = namec;
             this.desc = descc;
@@ -30,16 +45,11 @@ public class CardManager : MonoBehaviour
     }
     void Start()
     {
-        cards[0] = new card("koko", "hihiihihih", 2, new int[] { 1 }, new int[] { 1 }, new int[] { 3 });
-        cards[1] = new card("koko", "hihiihihih", 2, new int[] { 1 }, new int[] { 1 }, new int[] { 3 });
-        cards[7] = new card("kokaso", "hihiihi32hih", 2, new int[] { 31 }, new int[] { 14 }, new int[] { 35 });
-        cards[8] = new card("kokdasfo", "hihiihadihih", 2, new int[] { 13 }, new int[] { 11 }, new int[] { 33 });
-        cards[9] = new card("koko", "hihiihihih", 2, new int[] { 1 }, new int[] { 1 }, new int[] { 3 });
-        cards[2] = new card("kokaso", "hihiihi32hih", 2, new int[] { 31 }, new int[] { 14 }, new int[] { 35 });
-        cards[3] = new card("kokdasfo", "hihiihadihih", 2, new int[] { 13 }, new int[] { 11 }, new int[] { 33 });
-        cards[4] = new card("koko", "hihiihihih", 2, new int[] { 1 }, new int[] { 1 }, new int[] { 3 });
-        cards[5] = new card("kokaso", "hihiihi32hih", 2, new int[] { 31 }, new int[] { 14 }, new int[] { 35 });
-        cards[6] = new card("kokdasfo", "hihiihadihih", 2, new int[] { 13 }, new int[] { 11 }, new int[] { 33 });
+        cards.Add(new card("This shouldn't happen", "You have accessed the 0th index of the cards array", 1, new actionType[] { actionType.special }, new DamageType[] { DamageType.dark }, new int[] { 1000 }));
+        cards.Add(new card("Shoot", "Deal 4 damange", 1, new actionType[] { actionType.attack }, new DamageType[] { DamageType.physical }, new int[] { 4 }));
+        cards.Add(new card("Defend", "Defend for 5", 2, new actionType[] { actionType.defend }, new DamageType[] { DamageType.physical }, new int[] { 5 }));
+        cards.Add(new card("Bandage", "Heal 7 hp to your character", 3, new actionType[] { actionType.heal }, new DamageType[] { DamageType.physical }, new int[] { 7 }));
+
         InitializeGame();
 
     }
