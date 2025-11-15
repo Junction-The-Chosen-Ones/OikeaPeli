@@ -7,6 +7,8 @@ public class CardVisual : MonoBehaviour
     public TMP_Text Desc;
     public TMP_Text Cost;
     public RectTransform trans;
+    public Coroutine UpAnimEnum = null;
+    public Coroutine DownAnimEnum = null;
 
     public void set(string tempname,string tempdesc,string tempcost)
     {
@@ -17,10 +19,11 @@ public class CardVisual : MonoBehaviour
 
     IEnumerator CardUpEnum()
     {
+        print("UpEnum");
         float timer = 0;
-        while(timer < 0.5)
+        while(timer < 0.25)
         {
-            trans.anchoredPosition = new Vector2(trans.anchoredPosition.x,-360+Mathf.Lerp(0,100,(float)timer/0.5f));
+            trans.anchoredPosition = new Vector2(trans.anchoredPosition.x,-360+Mathf.Lerp(0,100,(float)timer/0.25f));
             timer += Time.deltaTime;
             yield return null;
         }
@@ -28,22 +31,35 @@ public class CardVisual : MonoBehaviour
 
     IEnumerator CardDownEnum()
     {
+        print("DownEnum");
         float timer = 0;
-        while (timer < 0.5)
+        while (timer < 0.1)
         {
-            trans.anchoredPosition = new Vector2(trans.anchoredPosition.x, -360 + Mathf.Lerp(0, 100, (0.5f-(float)timer) / 0.5f));
+            trans.anchoredPosition = new Vector2(trans.anchoredPosition.x, -360 + Mathf.Lerp(0, 100, (0.1f-(float)timer) / 0.1f));
             timer += Time.deltaTime;
             yield return null;
         }
     }
     public void CardUp()
     {
-        StartCoroutine(CardUpEnum());
+        print("UpFunct");
+        UpAnimEnum = StartCoroutine(CardUpEnum());
+        if(DownAnimEnum != null)
+        {
+            StopCoroutine(DownAnimEnum);
+        }
+
     }
 
     public void CardDown()
     {
-        StartCoroutine(CardDownEnum());
+        print("DownFunct");
+        DownAnimEnum = StartCoroutine(CardDownEnum());
+        if(UpAnimEnum != null)
+        {
+            StopCoroutine(UpAnimEnum);
+        }
+
     }
 
 }

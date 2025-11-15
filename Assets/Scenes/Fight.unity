@@ -832,6 +832,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4400857023039869448, guid: 4cfdb8cd608fe694f997d812c893b673, type: 3}
+      propertyPath: m_Size.x
+      value: 230
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400857023039869448, guid: 4cfdb8cd608fe694f997d812c893b673, type: 3}
+      propertyPath: m_Size.y
+      value: 320
+      objectReference: {fileID: 0}
+    - target: {fileID: 4400857023039869448, guid: 4cfdb8cd608fe694f997d812c893b673, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6966063560835030067, guid: 4cfdb8cd608fe694f997d812c893b673, type: 3}
       propertyPath: m_Name
       value: CardBase1

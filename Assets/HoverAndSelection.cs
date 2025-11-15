@@ -1,6 +1,7 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class HoverAndSelection : MonoBehaviour
+public class HoverAndSelection : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [HideInInspector]
     public bool hover = false;
@@ -16,12 +17,13 @@ public class HoverAndSelection : MonoBehaviour
         
     }
 
-    private void OnMouseOver()
+    public void OnPointerEnter(PointerEventData pointerEventData)
     {
+        print("OnMouseOver");
         hover = true;
         gameObject.GetComponent<CardVisual>().CardUp();
     }
-    private void OnMouseExit()
+    public void OnPointerExit(PointerEventData pointerEventData)
     {
         hover = false;
         gameObject.GetComponent<CardVisual>().CardDown();

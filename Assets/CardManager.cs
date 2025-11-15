@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 public class CardManager : MonoBehaviour
 {
-    public card[] cards = new card[50];
+    public List<card> cards = new List<card>{ };
     public int[] hand = new int[6] {0,0,0,0,0,0};
     public int[] cardpool = new int[] { 1, 2, 3 };
     public GameObject[] cardobjects;
