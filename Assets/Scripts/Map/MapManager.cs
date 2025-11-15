@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 public class MapManager : MonoBehaviour
 {
@@ -77,7 +78,7 @@ public class MapManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        GenerateMap(new Vector3(-4, 0, -1));
+        GenerateMap(new Vector3(-6, 1, -1));
         playerIcon = Instantiate(MapIcon, new Vector3(0, 0, 0), Quaternion.identity);
 
     }
@@ -105,9 +106,10 @@ public class MapManager : MonoBehaviour
                 currentColumn++;
                 SetNodeColor(nodes[currentColumn][currentNode].nodeObject, Color.red);
                 Destroy(nodes[currentColumn][currentNode].nodeEffect.NodeEffectIcon);
-                if (currentColumn == nodes.Length)
+                if (currentColumn == nodes.Length-1)
                 {
-                    GenerateMap(new Vector3(-4, 0, -1));
+                    ClearMap();
+                    GenerateMap(new Vector3(-6, 1, -1));
                 }
                 else
                 {
@@ -125,7 +127,25 @@ public class MapManager : MonoBehaviour
         SpriteRenderer rend = myObject.GetComponent<SpriteRenderer>();
         rend.color = color;
     }
-
+    private void ClearMap()
+    {
+        for (int i=0; i<nodes.Length;i++)
+        {
+            for (int j=0; j < nodes[i].Length;j++)
+            {
+                MapNode currentNode = nodes[i][j];
+                Destroy(currentNode.nodeObject);
+                Destroy(currentNode.nodeEffect.NodeEffectIcon);
+                for (int k=0; k < currentNode.linkObjects.Length; k++)
+                {
+                    for (int l=0; l < currentNode.linkObjects[k].Length; l++)
+                    {
+                        Destroy(currentNode.linkObjects[k][l]);
+                    }
+                }
+            }
+        }
+    }
 
     private void GenerateMap(Vector3 startPos)
     {
