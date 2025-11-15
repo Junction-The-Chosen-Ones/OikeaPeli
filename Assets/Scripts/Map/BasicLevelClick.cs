@@ -18,7 +18,6 @@ public class BasicLevelClick : MonoBehaviour
             if (colliderLevel && !click)
             {
                 click = true;
-                print("yipee");
             }
         }
         else
