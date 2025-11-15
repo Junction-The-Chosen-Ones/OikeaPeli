@@ -2,38 +2,40 @@ using UnityEngine;
 
 public class NetworkDataPost
 {
-	public class roomCompletion
-	{
-		public int killCount;
-		public string roomType;
-	}
+	
 	public struct Card
 	{
-		public int id;
 		public string name;
-		public CardType cardType;
-		public EffectType effectType;
-		public DamageType damageType;
-		public int power;
+		public string desc;
 		public int cost;
+		public actionType[] cardType;
+		public DamageType[] damageType;
+		public int[] Amount;
+		public string spriteLink;
+
+		// Constructor to initialize all fields. Null array arguments are converted to empty arrays.
+		public Card(string name, string desc, int cost, actionType[] cardType, DamageType[] damageType, int[] Amount, string spriteLink)
+		{
+			this.name = name;
+			this.desc = desc;
+			this.cost = cost;
+			this.cardType = cardType;
+			this.damageType = damageType;
+			this.Amount = Amount;
+			this.spriteLink = spriteLink;
+		}
 	}
-	public enum CardType
+	public enum actionType
 	{
-		healing = 0,
+		attack = 0,
 		defend = 1,
-		damage = 2,
-	}
-	public enum EffectType
-	{
-		stun = 0,
-		direct = 1,
 		heal = 2,
-		overtime = 3,
+		special = 3,
 	}
 	public enum DamageType
 	{
 		physical = 0,
-		elematal = 1,
+		elemental = 1,
 		holy = 2,
 		dark = 3
 	}

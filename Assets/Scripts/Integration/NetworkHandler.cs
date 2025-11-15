@@ -15,37 +15,10 @@ public class NetworkHandler : MonoBehaviour
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	private void Start()
     {
-		StartCoroutine(Upload());
 		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/gen/full-story"));
+		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/cards/random-card"));
 	}
-	IEnumerator Upload()
-	{
-		string url = "http://junction.nekofromit.com/";
 
-		// Convert C# object to JSON
-		string json = JsonUtility.ToJson(networkDataset);
-		Debug.Log("Sending JSON: " + json);
-
-		// Create POST request manually (Unity 6000+)
-		var request = new UnityWebRequest(url, "POST");
-		byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-
-		request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-		request.downloadHandler = new DownloadHandlerBuffer();
-		request.SetRequestHeader("Content-Type", "application/json");
-
-		yield return request.SendWebRequest();
-
-		if (request.result == UnityWebRequest.Result.Success)
-		{
-			Debug.Log("Upload success!");
-			Debug.Log("Server response: " + request.downloadHandler.text);
-		}
-		else
-		{
-			Debug.LogError("Upload failed: " + request.error);
-		}
-	}
 
 
 	IEnumerator GetRequest(string uri)
@@ -54,34 +27,41 @@ public class NetworkHandler : MonoBehaviour
 		{
 			yield return webRequest.SendWebRequest();
 
-			string[] pages = uri.Split('/');
-			int page = pages.Length - 1;
-
 			if (webRequest.result != UnityWebRequest.Result.Success)
 			{
 				Debug.LogError("Error: " + webRequest.error);
 				yield break;
 			}
 
-			// Save JSON
 			jsonResponse = webRequest.downloadHandler.text;
 			Debug.Log("Received JSON: " + jsonResponse);
 
-			// Deserialize here
-			networkDataset = JsonUtility.FromJson<NetworkDataset>(jsonResponse);
-			//Debug.Log("Lenght of response data: " + NetworkDataset.ToString().Length);
+			// Deserialize correctly
+			NetworkDataset.Root root = JsonUtility.FromJson<NetworkDataset.Root>(jsonResponse);
+
+			// Validation checks
+			if (root == null)
+			{
+				Debug.LogError("Root is NULL — JSON does not match class structure!");
+				yield break;
+			}
+
+			if (root.data == null)
+			{
+				Debug.LogError("root.data is NULL — JSON missing `data` field!");
+				yield break;
+			}
+
+			Debug.Log("Entities: " + root.data.entities.Length);
+			Debug.Log("Dialogs: " + root.data.dialogs.Length);
+			Debug.Log("Context: " + root.data.context.Substring(0, 40) + "...");
+			Debug.Log("Cards: " + root.data.cards.Length);
 		}
 	}
 
 	// Update is called once per frame
 	private void Update()
     {
-		string network = JsonUtility.ToJson(networkDataset);
-		string json = JsonUtility.ToJson(networkDataset);
-		print(json);
-		//print(network);
-
-
 
 	}
 }
