@@ -6,6 +6,7 @@ public class MapManager : MonoBehaviour
 {
     static int currentColumn = 0;
     static int currentNode = 0;
+    static int EncounterCounter = 0; //Capped at 3, because image-generation takes time and money
     int playerAnimCounter = 0;
     int playerAnimCoef= 1;
 
@@ -34,8 +35,12 @@ public class MapManager : MonoBehaviour
             {
                 nodeType = Random.Range(0, MapIconList.Length-1);
             }
+            if (nodeType == 0)
+            {
+                if (EncounterCounter == 3) { nodeType = 1; }
+                else { EncounterCounter += 1;}
+            }
             GameObject nodeIcon = Instantiate(MapIcon, nodePos+new Vector3(0, 0.8f, -1), Quaternion.identity);
-            print($"{nodeType}");
             nodeIcon.GetComponent<SpriteRenderer>().sprite = MapIconList[nodeType];
             nodeEffect = new NodeEffect();
             nodeEffect.NodeEffectIcon = nodeIcon;
@@ -52,7 +57,7 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    public class MapState
+    public class MapState //Currently deprecated; if this is here it means I forgot to delete it
     {
         public MapNode[][] mapNodes;
         public int currentColumnIndex;
@@ -92,6 +97,7 @@ public class MapManager : MonoBehaviour
         Transform playertransformer = playerIcon.GetComponent<Transform>();
         playertransformer.position = nodes[currentColumn][currentNode].nodePos + new Vector3(0, 0.8f, 0) + new Vector3(0, -0.05f * playerAnimCoef, 0);
 
+        //Node click-checker & Protocol
         for (int i = 0; i < nodes[currentColumn][currentNode].linkIndices.Length; i++)
         {
             int linkedNodeIndex = nodes[currentColumn][currentNode].linkIndices[i];
@@ -149,8 +155,9 @@ public class MapManager : MonoBehaviour
 
     private void GenerateMap(Vector3 startPos)
     {
+        EncounterCounter = 0;
         int rowHeight = 4;
-        int columnAmount = Random.Range(2, 5)+2;
+        int columnAmount = Random.Range(3, 5)+2;
         int nodeAmount = Random.Range(2, 5);
         float columnOffset = Mathf.Abs(startPos.x + startPos.x)/(float)(columnAmount-1);
 
