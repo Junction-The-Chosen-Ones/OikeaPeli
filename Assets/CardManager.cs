@@ -9,7 +9,7 @@ public class CardManager : MonoBehaviour
     public UIHandler uihandler;
     GameObject UICanvas;
 
-    public enum actionType
+    public enum cardType
     {
         attack = 0,
         defend = 1,
@@ -28,16 +28,16 @@ public class CardManager : MonoBehaviour
         public string name;
         public string desc;
         public int cost;
-        public actionType[] actiontype;
+        public cardType[] cardtype;
         public DamageType[] damagetype;
         public int[] amount;
         
-        public card(string namec, string descc, int costc, actionType[] actiontypec, DamageType[] damagetypec, int[] amountc)
+        public card(string namec, string descc, int costc, cardType[] cardtypec, DamageType[] damagetypec, int[] amountc)
         {
             this.name = namec;
             this.desc = descc;
             this.cost = costc;
-            this.actiontype = actiontypec;
+            this.cardtype = cardtypec;
             this.damagetype = damagetypec;
             this.amount = amountc;
         }
@@ -45,10 +45,10 @@ public class CardManager : MonoBehaviour
     }
     void Start()
     {
-        cards.Add(new card("This shouldn't happen", "You have accessed the 0th index of the cards array", 1, new actionType[] { actionType.special }, new DamageType[] { DamageType.dark }, new int[] { 1000 }));
-        cards.Add(new card("Shoot", "Deal 4 damange", 1, new actionType[] { actionType.attack }, new DamageType[] { DamageType.physical }, new int[] { 4 }));
-        cards.Add(new card("Defend", "Defend for 5", 2, new actionType[] { actionType.defend }, new DamageType[] { DamageType.physical }, new int[] { 5 }));
-        cards.Add(new card("Bandage", "Heal 7 hp to your character", 3, new actionType[] { actionType.heal }, new DamageType[] { DamageType.physical }, new int[] { 7 }));
+        cards.Add(new card("This shouldn't happen", "You have accessed the 0th index of the cards array", 1, new cardType[] { cardType.special }, new DamageType[] { DamageType.dark }, new int[] { 1000 }));
+        cards.Add(new card("Shoot", "Deal 4 damange", 1, new cardType[] { cardType.attack }, new DamageType[] { DamageType.physical }, new int[] { 4 }));
+        cards.Add(new card("Defend", "Defend for 5", 2, new cardType[] { cardType.defend }, new DamageType[] { DamageType.physical }, new int[] { 5 }));
+        cards.Add(new card("Bandage", "Heal 7 hp to your character", 3, new cardType[] { cardType.heal }, new DamageType[] { DamageType.physical }, new int[] { 7 }));
 
         InitializeGame();
 
@@ -57,23 +57,23 @@ public class CardManager : MonoBehaviour
     public void CardProq(int card)
     {
         gameObject.GetComponentInChildren<PlayerStats>().HPHandling(cards[card].cost*-1); 
-        for(int i = 0; i < cards[i].actiontype.Length; i++)
+        for(int i = 0; i < cards[i].cardtype.Length; i++)
         {
-            switch (cards[card].actiontype[i])
+            switch (cards[card].cardtype[i])
             {
-                case actionType.attack:
+                case cardType.attack:
                     gameObject.GetComponentInChildren<Enemy>().HPHandling(cards[card].amount[i]*-1);
                     Debug.Log(cards[card].amount[i] * -1);
                     break;
-                case actionType.special:
+                case cardType.special:
                     gameObject.GetComponentInChildren<Enemy>().HPHandling(-cards[card].amount[i] * -1);
                     Debug.Log(cards[card].amount[i] * -1);
                     break;
-                case actionType.defend:
+                case cardType.defend:
                     gameObject.GetComponentInChildren<PlayerStats>().Shield += (cards[card].amount[i]);
                     gameObject.GetComponentInChildren<PlayerStats>().UpdateText();
                     break;
-                case actionType.heal:
+                case cardType.heal:
                     gameObject.GetComponentInChildren<PlayerStats>().HPHandling(cards[card].amount[i]);
                     break;
             }
@@ -82,22 +82,22 @@ public class CardManager : MonoBehaviour
 
     public void EnemyCardProq(int card)
     {
-        for (int i = 0; i < cards[i].actiontype.Length; i++)
+        for (int i = 0; i < cards[i].cardtype.Length; i++)
         {
-            switch (cards[card].actiontype[i])
+            switch (cards[card].cardtype[i])
             {
-                case actionType.attack:
+                case cardType.attack:
                     gameObject.GetComponentInChildren<PlayerStats>().HPHandling(cards[card].amount[i]*-1);
                     Debug.Log(cards[card].amount[i] * -1);
                     break;
-                case actionType.special:
+                case cardType.special:
                     gameObject.GetComponentInChildren<PlayerStats>().HPHandling(cards[card].amount[i] * -1);
                     Debug.Log(cards[card].amount[i] * -1);
                     break;
-                case actionType.defend:
+                case cardType.defend:
                     gameObject.GetComponentInChildren<Enemy>().Shield += (cards[card].amount[i]);
                     break;
-                case actionType.heal:
+                case cardType.heal:
                     gameObject.GetComponentInChildren<Enemy>().HPHandling(cards[card].amount[i]);
                     break;
             }
