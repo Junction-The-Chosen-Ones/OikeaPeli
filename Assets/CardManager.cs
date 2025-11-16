@@ -6,7 +6,8 @@ public class CardManager : MonoBehaviour
 {
 
 
-    public static List<card> cards = new List<card>{ };
+    public List<card> cardsFu = new List<card>{ };
+    public List<card> cards = new();
     public int[] hand = new int[6] {0,0,0,0,0,0};
     public static GameObject[] cardobjects;
     public List<int> cardpool = new() { };
@@ -36,9 +37,10 @@ public class CardManager : MonoBehaviour
     void Start()
     {
         cards.Add(new card("This shouldn't happen", "You have accessed the 0th index of the cards array", 1, new cardType[] { cardType.special }, new DamageType[] { DamageType.dark }, new int[] { 1000 }));
-        cards.Add(new card("Shoot", "Deal 4 damange", 1, new cardType[] { cardType.attack }, new DamageType[] { DamageType.physical }, new int[] { 4 }));
-        cards.Add(new card("Defend", "Defend for 5", 2, new cardType[] { cardType.defend }, new DamageType[] { DamageType.physical }, new int[] { 5 }));
-        cards.Add(new card("Bandage", "Heal 7 hp to your character", 3, new cardType[] { cardType.heal }, new DamageType[] { DamageType.physical }, new int[] { 7 }));
+        cards.AddRange(cardsFu);
+        //cards.Add(new card("Shoot", "Deal 4 damange", 1, new cardType[] { cardType.attack }, new DamageType[] { DamageType.physical }, new int[] { 4 }));
+        //cards.Add(new card("Defend", "Defend for 5", 2, new cardType[] { cardType.defend }, new DamageType[] { DamageType.physical }, new int[] { 5 }));
+        //cards.Add(new card("Bandage", "Heal 7 hp to your character", 3, new cardType[] { cardType.heal }, new DamageType[] { DamageType.physical }, new int[] { 7 }));
 
         InitializeGame();
 
