@@ -1,26 +1,49 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
-public class NodeManager : MonoBehaviour
+public class MapManager : MonoBehaviour
 {
-    int currentColumn = 0;
-    int currentNode = 0;
+    static int currentColumn = 0;
+    static int currentNode = 0;
+    static int EncounterCounter = 0; //Capped at 3, because image-generation takes time and money
+    int playerAnimCounter = 0;
+    int playerAnimCoef= 1;
+
+    public Sprite[] MapIconList;
     public static MapNode[][] nodes; //Array of arrays(columns of nodes)
 
     [SerializeField] private GameObject LevelNode;
     [SerializeField] private GameObject Pathline;
+    [SerializeField] private GameObject MapIcon;
 
+    static GameObject playerIcon;
     public class MapNode
     {
         public int[] linkIndices;
         public Vector3 nodePos;
         public GameObject nodeObject;
         public GameObject[][] linkObjects;
-        public MapNode(int[] linkindices, Vector3 nodepos, GameObject levelNode)
+        public NodeEffect nodeEffect;
+
+        public MapNode(int[] linkindices, Vector3 nodepos, GameObject levelNode, GameObject MapIcon, Sprite[] MapIconList, int nodeType = -1)
         {
             linkIndices = linkindices;
             nodePos = nodepos;
             nodeObject = Instantiate(levelNode, nodePos, Quaternion.identity);
+            if (nodeType == -1)
+            {
+                nodeType = Random.Range(0, MapIconList.Length-1);
+            }
+            if (nodeType == 0)
+            {
+                if (EncounterCounter == 3) { nodeType = 1; }
+                else { EncounterCounter += 1;}
+            }
+            GameObject nodeIcon = Instantiate(MapIcon, nodePos+new Vector3(0, 0.8f, -1), Quaternion.identity);
+            nodeIcon.GetComponent<SpriteRenderer>().sprite = MapIconList[nodeType];
+            nodeEffect = new NodeEffect();
+            nodeEffect.NodeEffectIcon = nodeIcon;
         }
 
         public void DrawLinks(int myColumn, GameObject pathLine)
@@ -33,15 +56,48 @@ public class NodeManager : MonoBehaviour
             linkObjects = links.ToArray();
         }
     }
+
+    public class MapState //Currently deprecated; if this is here it means I forgot to delete it
+    {
+        public MapNode[][] mapNodes;
+        public int currentColumnIndex;
+        public int currentNodeIndex;
+        
+        public void SaveMapState(int currentColumn, int currentNode)
+        {
+            mapNodes = nodes;
+            currentColumnIndex = currentColumn;
+            currentNodeIndex = currentNode;
+
+        }
+        public void RestoreMapState()
+        {
+            print("Placeholder");
+        }
+    }
+
+    public struct NodeEffect
+    {
+        public GameObject NodeEffectIcon;
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        GenerateMap(new Vector3(-4, 0, -1));
+        GenerateMap(new Vector3(-6, 1, -1));
+        playerIcon = Instantiate(MapIcon, new Vector3(0, 0, 0), Quaternion.identity);
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        //Player icon control:
+        playerAnimCounter++;
+        if (playerAnimCounter == 60) { playerAnimCounter = 0; playerAnimCoef = -playerAnimCoef; }
+        Transform playertransformer = playerIcon.GetComponent<Transform>();
+        playertransformer.position = nodes[currentColumn][currentNode].nodePos + new Vector3(0, 0.8f, 0) + new Vector3(0, -0.05f * playerAnimCoef, 0);
+
+        //Node click-checker & Protocol
         for (int i = 0; i < nodes[currentColumn][currentNode].linkIndices.Length; i++)
         {
             int linkedNodeIndex = nodes[currentColumn][currentNode].linkIndices[i];
@@ -55,9 +111,11 @@ public class NodeManager : MonoBehaviour
                 currentNode = linkedNodeIndex;
                 currentColumn++;
                 SetNodeColor(nodes[currentColumn][currentNode].nodeObject, Color.red);
-                if (currentColumn == nodes.Length)
+                Destroy(nodes[currentColumn][currentNode].nodeEffect.NodeEffectIcon);
+                if (currentColumn == nodes.Length-1)
                 {
-                    GenerateMap(new Vector3(-4, 0, -1));
+                    ClearMap();
+                    GenerateMap(new Vector3(-6, 1, -1));
                 }
                 else
                 {
@@ -75,17 +133,37 @@ public class NodeManager : MonoBehaviour
         SpriteRenderer rend = myObject.GetComponent<SpriteRenderer>();
         rend.color = color;
     }
+    private void ClearMap()
+    {
+        for (int i=0; i<nodes.Length;i++)
+        {
+            for (int j=0; j < nodes[i].Length;j++)
+            {
+                MapNode currentNode = nodes[i][j];
+                Destroy(currentNode.nodeObject);
+                Destroy(currentNode.nodeEffect.NodeEffectIcon);
+                for (int k=0; k < currentNode.linkObjects.Length; k++)
+                {
+                    for (int l=0; l < currentNode.linkObjects[k].Length; l++)
+                    {
+                        Destroy(currentNode.linkObjects[k][l]);
+                    }
+                }
+            }
+        }
+    }
 
     private void GenerateMap(Vector3 startPos)
     {
-        int rowHeight = 3;
-        int columnAmount = Random.Range(2, 5)+2;
+        EncounterCounter = 0;
+        int rowHeight = 4;
+        int columnAmount = Random.Range(3, 5)+2;
         int nodeAmount = Random.Range(2, 5);
         float columnOffset = Mathf.Abs(startPos.x + startPos.x)/(float)(columnAmount-1);
 
         int[] startNodeLinks = new int[nodeAmount];
         for (int i = 0; i < nodeAmount; i++) { startNodeLinks[i] = i; }
-        MapNode[] startNodeColumn = { new MapNode(startNodeLinks, startPos, LevelNode) };
+        MapNode[] startNodeColumn = { new MapNode(startNodeLinks, startPos, LevelNode, MapIcon, MapIconList) };
         nodes = new MapNode[columnAmount][];
         nodes[0] = startNodeColumn;
 
@@ -104,15 +182,15 @@ public class NodeManager : MonoBehaviour
                 int[] linkindices = linkIndices.ToArray();
                 if (linkindices.Length == 0) { linkIndices.Add(Random.Range(0, nextNodeAmount)); linkindices = linkIndices.ToArray(); } //If no links were added
                 if (i == columnAmount-3){ linkindices = new int[1]; linkindices[0] = 0; }
-                MapNode node = new MapNode(linkindices, new Vector3(startPos.x + columnOffset * (i+1), startPos.y + rowHeight - (rowOffset * (j+1)), startPos.z), LevelNode);
+                MapNode node = new MapNode(linkindices, new Vector3(startPos.x + columnOffset * (i+1), startPos.y + rowHeight - (rowOffset * (j+1)), startPos.z), LevelNode, MapIcon, MapIconList);
                 nodesOfColumn[j] = node;
             }
             nodes[i + 1] = nodesOfColumn;
             nodeAmount = nextNodeAmount;
         }
-        MapNode[] endNodeColumn = { new MapNode(new int[]{}, startPos+new Vector3((columnAmount-1)*columnOffset,0,0), LevelNode) };
+        MapNode[] endNodeColumn = { new MapNode(new int[]{}, startPos+new Vector3((columnAmount-1)*columnOffset,0,0), LevelNode, MapIcon, MapIconList, 5) };
         nodes[columnAmount-1] = endNodeColumn;
-        //Check that all nodes are connected to at least one other node. I am so sorry for this, I was tired
+        //Check that all nodes are connected to at least one other node. I am so sorry for this spagetti, I was tired
         for (int i = 2; i < nodes.Length; i++) //Iterate through all columns
         {
             for (int j = 0; j < nodes[i].Length; j++) // Iterate through the nodes of the column
@@ -140,18 +218,19 @@ public class NodeManager : MonoBehaviour
                 }
             }
         }
-        SetNodeColor(nodes[0][0].nodeObject, Color.red);
-        for (int i = 0; i < nodes[currentColumn][currentNode].linkIndices.Length; i++)
-        {
-            SetNodeColor(nodes[currentColumn + 1][nodes[currentColumn][currentNode].linkIndices[i]].nodeObject, Color.green);
-        }
+        currentColumn = 0;
+        currentNode = 0;
         DrawNodeMap();
     }
 
     private void DrawNodeMap()
     {
-        currentColumn = 0;
-        currentNode = 0;
+        SetNodeColor(nodes[0][0].nodeObject, Color.red);
+        Destroy(nodes[0][0].nodeEffect.NodeEffectIcon);
+        for (int i = 0; i < nodes[currentColumn][currentNode].linkIndices.Length; i++)
+        {
+            SetNodeColor(nodes[currentColumn + 1][nodes[currentColumn][currentNode].linkIndices[i]].nodeObject, Color.green);
+        }
 
         //Draw nodes & columns
         for (int i = 0; i < nodes.Length; i++)

@@ -19,7 +19,6 @@ public class HoverAndSelection : MonoBehaviour, IPointerEnterHandler, IPointerEx
 
     public void OnPointerEnter(PointerEventData pointerEventData)
     {
-        print("OnMouseOver");
         hover = true;
         gameObject.GetComponent<CardVisual>().CardUp();
     }
