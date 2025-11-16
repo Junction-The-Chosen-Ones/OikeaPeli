@@ -36,6 +36,16 @@ public class StateManager : MonoBehaviour
             case State.PlayerFight:
                 timer = 0;
                 gameObject.GetComponent<UIHandler>().StartButton.SetActive(false);
+                if(uihandler.SelectedCards.Count == 0)
+                {
+                    cardmanager.AddCardToHand();
+                    cardmanager.AddCardToHand();
+                    cardmanager.AddCardToHand();
+                }
+                else
+                {
+                    cardmanager.AddCardToHand();
+                }
                 for(int i = 0; i < uihandler.SelectedCards.Count; i++)
                 {
                     cardmanager.CardProq(cardmanager.hand[uihandler.SelectedCards[i]]);
@@ -54,7 +64,9 @@ public class StateManager : MonoBehaviour
             case State.EnemyFight:
                 timer = 0;
                 gameObject.GetComponent<UIHandler>().StartButton.SetActive(true);
-                cardmanager.AddCardToHand();
+                
+                cardmanager.EnemyCardProq(Random.Range(1,4));
+                cardmanager.EnemyCardProq(Random.Range(1, 4));
                 while (timer < 1)
                 {
                     timer += Time.deltaTime;
