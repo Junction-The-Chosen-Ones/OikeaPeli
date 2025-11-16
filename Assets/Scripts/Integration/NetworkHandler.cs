@@ -16,6 +16,7 @@ public class NetworkHandler : MonoBehaviour
 	static cardRoot cardRoot;
 	static List<Card> cardList;
 	public CardManager cardManager;
+	public MapManager map;
 
 	private static string storyJson;
 	private static string cardsJson;
@@ -24,6 +25,7 @@ public class NetworkHandler : MonoBehaviour
 	private void Start()
 	{
 		cardManager = GameObject.FindFirstObjectByType<CardManager>();
+		map = FindFirstObjectByType<MapManager>();
 	
 		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/cards/all-cards", (response) =>
 		{
@@ -40,8 +42,8 @@ public class NetworkHandler : MonoBehaviour
 
 			foreach (var card in cards)
 			{
-                Debug.Log($"Card Name: {card.name}, Description: {card.desc}, Cost: {card.cost}");
-                CardManager.cards.Add(card.ToCMCard());
+				Debug.Log($"Card Name: {card.name}, Description: {card.desc}, Cost: {card.cost}");
+				cardManager.cardsFu.Add(card.ToCMCard());
 			}
 
 			for (int i = 0; i < 10; i++)
@@ -66,7 +68,7 @@ public class NetworkHandler : MonoBehaviour
 				{
 					continue;
 				}
-				MapManager.enemies.Add(e);
+				map.enemies.Add(e);
 			}
 		}));
 
@@ -77,7 +79,7 @@ public class NetworkHandler : MonoBehaviour
 
 			foreach (DialogEntry d in ck)
 			{
-				MapManager.dialogs.Add(d);
+				map.dialogs.Add(d);
 			}
 		}));
 
@@ -103,7 +105,7 @@ public class NetworkHandler : MonoBehaviour
 	private void Update()
 	{
 		//thing();
-    }
+	}
 
 	IEnumerator GetRequest(string uri, System.Action<string> onSuccess)
 	{
