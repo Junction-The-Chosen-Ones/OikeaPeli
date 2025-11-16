@@ -9,31 +9,77 @@ using UnityEngine.Networking;
 using static NetworkDataset;
 public class NetworkHandler : MonoBehaviour
 {
-	NetworkDataset.Root networkDataset;
-	NetworkDataset.Data story;
-	NetworkDataset.Entity[] entities;
-	NetworkDataset.Card[] cards;
-	NetworkDataset.cardRoot cardRoot;
-	CardManager cardManager;
+	static Root networkDataset;
+	static Data story;
+	static Entity[] entities;
+	static Card[] cards;
+	static cardRoot cardRoot;
+	static List<Card> cardList;
+	public CardManager cardManager;
 
-	private string storyJson;
-	private string cardsJson;
-	private bool cardsReady = false;
+	private static string storyJson;
+	private static string cardsJson;
+	private static bool cardsReady = false;
 
 	private void Start()
 	{
-
+		cardManager = GameObject.FindFirstObjectByType<CardManager>();
 	
 		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/cards/all-cards", (response) =>
 		{
 			cardsJson = response;
-			cardRoot cardRoot = JsonConvert.DeserializeObject<cardRoot>(cardsJson);
-			cards = cardRoot.data;
+			var t = JsonConvert.DeserializeObject<cardRoot>(cardsJson);
+			
+			cardRoot = t; // JsonConvert.DeserializeObject<cardRoot>(cardsJson);
+			cards = cardRoot.data[0].cards;
+			
 			Debug.Log("Cards JSON: " + cardsJson);
-			cardsReady = true;
 
+			Debug.Log("Cards: " + cards);
+			cardList = cards.ToList();
+
+			foreach (var card in cards)
+			{
+                Debug.Log($"Card Name: {card.name}, Description: {card.desc}, Cost: {card.cost}");
+                CardManager.cards.Add(card.ToCMCard());
+			}
+
+			for (int i = 0; i < 10; i++)
+			{
+				cardManager.AddRandomCardToPool();
+			}
+			Debug.LogWarning("Cardpool contains the following indices: " + cardManager.cardpool.ToArray());
+			
+			cardsReady = true;
 		}));
 
+		// Fetc entities
+		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/gen/entities", (response) => {
+			var t = JsonConvert.DeserializeObject<fu>(response);
+			var fu = t.entities;
+
+
+			foreach (Entity e in fu)
+			{
+				// Skippa the player
+				if (!e.is_enemy)
+				{
+					continue;
+				}
+				MapManager.enemies.Add(e);
+			}
+		}));
+
+		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/gen/dialogs", (response) =>
+		{
+			var t = JsonConvert.DeserializeObject<ck>(response);
+			var ck = t.dialogs;
+
+			foreach (DialogEntry d in ck)
+			{
+				MapManager.dialogs.Add(d);
+			}
+		}));
 
 		// Fetch full story
 		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/gen/full-story", (response) =>
@@ -42,13 +88,21 @@ public class NetworkHandler : MonoBehaviour
 			Debug.Log("Full Story JSON: " + storyJson);
 
 		}));
+	}
 
+	class fu
+	{
+		public Entity[] entities;
+	}
 
+	class ck
+	{
+		public DialogEntry[] dialogs;
 	}
 
 	private void Update()
 	{
-		thing();
+		//thing();
     }
 
 	IEnumerator GetRequest(string uri, System.Action<string> onSuccess)
@@ -71,34 +125,44 @@ public class NetworkHandler : MonoBehaviour
 
 	
 
-	public void thing()
-	{
-		cardRoot cardRoot = JsonConvert.DeserializeObject<cardRoot>(cardsJson);
-		cards = cardRoot.data;
+	//public void thing()
+	//{
+	//	//cardRoot cardRoot = JsonConvert.DeserializeObject<cardRoot>(cardsJson);
+	//	//cards = cardRoot.data[0].cards;
 
-		List<NetworkDataset.Card> cardList = cards.ToList();
-		print(cardList.Count);
+	//	var _c = cards;
+	//	if (_c == null)
+	//	{
+	//		Debug.LogError("fuck");
+	//		return;
+	//	}
+
+	//	foreach (var card in _c)
+	//	{
+	//		Debug.Log($"Card Name: {card.name}, Description: {card.desc}, Cost: {card.cost}");
+	//		cardManager.cards.Add(card.ToCMCard());
+	//	}
+	//}
+
+
+	Root ParseJSON(string jsonInput)
+	{
+		return JsonConvert.DeserializeObject<Root>(jsonInput);
 	}
 
-
-	NetworkDataset.Root ParseJSON(string jsonInput)
-	{
-		return JsonConvert.DeserializeObject<NetworkDataset.Root>(jsonInput);
-	}
-
-	NetworkDataset.Card[] GetAllCards(NetworkDataset.Root root)
+	Card[] GetAllCards(Root root)
 	{
 		var cards = root.data.cards;
 		return cards;
 	}
 
-	NetworkDataset.Card GetCard(NetworkDataset.Root root, int i) 
+	Card GetCard(Root root, int i) 
 	{
 		return root.data.cards[i];
 	}
 
 
-	NetworkDataset.Card GetRandomCard(NetworkDataset.Root root)
+	Card GetRandomCard(Root root)
 	{
 		var cards = root.data.cards;
 		if (cards.Length == 0)

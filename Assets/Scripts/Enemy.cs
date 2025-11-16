@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Enemy : MonoBehaviour
 {
@@ -82,7 +83,7 @@ public class Enemy : MonoBehaviour
     }
     void Death()
     {
-
+        SceneManager.LoadScene("Main");
     }
 
     void battlestart()
