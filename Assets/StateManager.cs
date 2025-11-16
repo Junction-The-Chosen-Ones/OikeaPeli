@@ -65,8 +65,7 @@ public class StateManager : MonoBehaviour
                 timer = 0;
                 gameObject.GetComponent<UIHandler>().StartButton.SetActive(true);
                 
-                cardmanager.EnemyCardProq(Random.Range(1,4));
-                cardmanager.EnemyCardProq(Random.Range(1, 4));
+                cardmanager.EnemyCardProq(Random.Range(1,CardManager.cards.Count));
                 while (timer < 1)
                 {
                     timer += Time.deltaTime;

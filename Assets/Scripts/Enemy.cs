@@ -83,6 +83,8 @@ public class Enemy : MonoBehaviour
     }
     void Death()
     {
+        GameObject.FindGameObjectWithTag("UI").GetComponentInChildren<PlayerStats>().HPHandling(20);
+        CurHP = MaxHP;
         SceneManager.LoadScene("Main");
     }
 

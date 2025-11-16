@@ -3,8 +3,8 @@ using TMPro;
 
 public class PlayerStats : MonoBehaviour
 {
-    static int MaxHP = 50;
-    static int CurHP = 50;
+    public static int MaxHP = 50;
+    public static int CurHP = 50;
     public int Shield = 0;
     int Strength = 0;
     int Endurance = 0;
