@@ -862,7 +862,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hand: 000000000000000000000000000000000000000000000000
-  cardobjects: []
   cardpool: 000000000100000002000000
   uihandler: {fileID: 902029186}
 --- !u!114 &902029185
@@ -1403,6 +1402,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8475036be1d20ee409dd6794c00ed9a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cardManager: {fileID: 0}
+  map: {fileID: 0}
+  storyJson:
+    data:
+      entities: []
+      dialogs: []
+      cards: []
+      context: 
 --- !u!1001 &1783528073
 PrefabInstance:
   m_ObjectHideFlags: 0

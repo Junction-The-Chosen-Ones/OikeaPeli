@@ -18,7 +18,7 @@ public class NetworkHandler : MonoBehaviour
 	public CardManager cardManager;
 	public MapManager map;
 
-	private static string storyJson;
+	public Root storyJson;
 	private static string cardsJson;
 	private static bool cardsReady = false;
 
@@ -40,12 +40,13 @@ public class NetworkHandler : MonoBehaviour
 			Debug.Log("Cards: " + cards);
 			cardList = cards.ToList();
 
-			foreach (var card in cards)
-			{
-				Debug.Log($"Card Name: {card.name}, Description: {card.desc}, Cost: {card.cost}");
-				cardManager.cardsFu.Add(card.ToCMCard());
-			}
 
+            foreach (var card in cards)
+			{
+				Debug.Log($"Card Name: {card.name}, Description: {card.desc}, Cost: {card.cost}, Amount: {card.amount[0]}, Cardtype: {card.cardType}");
+				cardManager.cardsFu.Add(card.ToCMCard());
+            }
+			
 			for (int i = 0; i < 10; i++)
 			{
 				cardManager.AddRandomCardToPool();
@@ -77,8 +78,9 @@ public class NetworkHandler : MonoBehaviour
 			var t = JsonConvert.DeserializeObject<ck>(response);
 			var ck = t.dialogs;
 
-			foreach (DialogEntry d in ck)
+			foreach (var d in ck)
 			{
+				Debug.LogError("Loading dialog: " + d.ToString());
 				map.dialogs.Add(d);
 			}
 		}));
@@ -86,9 +88,8 @@ public class NetworkHandler : MonoBehaviour
 		// Fetch full story
 		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/gen/full-story", (response) =>
 		{
-			storyJson = response;
+			storyJson = JsonConvert.DeserializeObject<Root>(response);
 			Debug.Log("Full Story JSON: " + storyJson);
-
 		}));
 	}
 

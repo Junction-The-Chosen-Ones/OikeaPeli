@@ -811,6 +811,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardManager: {fileID: 0}
   map: {fileID: 0}
+  storyJson:
+    data:
+      entities: []
+      dialogs: []
+      cards: []
+      context: 
 --- !u!1 &1946982126
 GameObject:
   m_ObjectHideFlags: 0
@@ -973,7 +979,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1974254224
 MonoBehaviour:
   m_ObjectHideFlags: 0
