@@ -3,13 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 public class CardManager : MonoBehaviour
 {
+
+
     public List<card> cards = new List<card>{ };
     public int[] hand = new int[6] {0,0,0,0,0,0};
-    public int[] cardpool = new int[] { 1, 2, 3 };
+    public int[] cardpool = new int[] { 1, 2, 3, 4, 5 };
     public GameObject[] cardobjects;
     GameObject UICanvas;
 
-    public enum actionType
+    public enum cardType
     {
         attack = 0,
         defend = 1,
@@ -28,16 +30,16 @@ public class CardManager : MonoBehaviour
         public string name;
         public string desc;
         public int cost;
-        public actionType[] actiontype;
+        private cardType[] cardType;
         public DamageType[] damagetype;
         public int[] amount;
         
-        public card(string namec, string descc, int costc, actionType[] actiontypec, DamageType[] damagetypec, int[] amountc)
+        public card(string namec, string descc, int costc, cardType[] actiontypec, DamageType[] damagetypec, int[] amountc)
         {
             this.name = namec;
             this.desc = descc;
             this.cost = costc;
-            this.actiontype = actiontypec;
+            this.cardType = actiontypec;
             this.damagetype = damagetypec;
             this.amount = amountc;
         }
@@ -45,16 +47,17 @@ public class CardManager : MonoBehaviour
     }
     void Start()
     {
-        cards.Add(new card("This shouldn't happen", "You have accessed the 0th index of the cards array", 1, new actionType[] { actionType.special }, new DamageType[] { DamageType.dark }, new int[] { 1000 }));
-        cards.Add(new card("Shoot", "Deal 4 damange", 1, new actionType[] { actionType.attack }, new DamageType[] { DamageType.physical }, new int[] { 4 }));
-        cards.Add(new card("Defend", "Defend for 5", 2, new actionType[] { actionType.defend }, new DamageType[] { DamageType.physical }, new int[] { 5 }));
-        cards.Add(new card("Bandage", "Heal 7 hp to your character", 3, new actionType[] { actionType.heal }, new DamageType[] { DamageType.physical }, new int[] { 7 }));
+        cards.Add(new card("This shouldn't happen", "You have accessed the 0th index of the cards array", 1, new cardType[] { cardType.special }, new DamageType[] { DamageType.dark }, new int[] { 1000 }));
+        cards.Add(new card("Shoot", "Deal 4 damange", 1, new cardType[] { cardType.attack }, new DamageType[] { DamageType.physical }, new int[] { 4 }));
+        cards.Add(new card("Defend", "Defend for 5", 2, new cardType[] { cardType.defend }, new DamageType[] { DamageType.physical }, new int[] { 5 }));
+        cards.Add(new card("Bandage", "Heal 7 hp to your character", 3, new cardType[] { cardType.heal }, new DamageType[] { DamageType.physical }, new int[] { 7 }));
 
         InitializeGame();
 
     }
 
-    void AddCardToHand(int kortti)
+
+	void AddCardToHand(int kortti)
     {
         for (int i = 0; i < 6; i++)
         {
@@ -103,8 +106,47 @@ public class CardManager : MonoBehaviour
             }
         }
     }
-    void Update()
+
+
+	public void PrintCards(List<CardManager.card> cardList)
+	{
+		if (cardList == null || cardList.Count == 0)
+		{
+			Debug.Log("No cards in the list.");
+			return;
+		}
+
+		for (int i = 0; i < cardList.Count; i++)
+		{
+   //         if (c.name == null) print("1");
+   //         if (c.desc == null) print("2");
+			//if (c.cost == 0) print("3");
+			//if (c.amount == null) print("4");
+			string cardInfo = $"Card {i}:\n" +
+                              $"  Name: {cardList[i].name}\n" +
+                              $"  Desc: {cardList[i].desc}\n" +
+                              $"  Cost: {cardList[i].cost}\n" +
+                              $"  Amount: {string.Join(", ", cardList[i].amount)}\n";
+
+
+			Debug.Log(cardInfo);
+		}
+	}
+
+	void Update()
     {
-       
+        //PrintCards(cards);
+        //print("deck size: " + cards.Count);
     }
+
+    card ParseCardJSON(string json)
+    {
+        if (string.IsNullOrEmpty(json))
+        {
+            Debug.LogError("Card JSON is null or empty.");
+            return null;
+		}
+        card parsedCard = JsonUtility.FromJson<card>(json);
+        return parsedCard;
+	}
 }
