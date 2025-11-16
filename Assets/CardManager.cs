@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 public class CardManager : MonoBehaviour
 {
+
+
     public List<card> cards = new List<card>{ };
     public int[] hand = new int[6] {0,0,0,0,0,0};
+    public GameObject[] cardobjects;
     public int[] cardpool = new int[] { 1, 2, 3 };
     public UIHandler uihandler;
     GameObject UICanvas;
@@ -165,8 +168,47 @@ public class CardManager : MonoBehaviour
             }
         }
     }
-    void Update()
+
+
+	public void PrintCards(List<CardManager.card> cardList)
+	{
+		if (cardList == null || cardList.Count == 0)
+		{
+			Debug.Log("No cards in the list.");
+			return;
+		}
+
+		for (int i = 0; i < cardList.Count; i++)
+		{
+   //         if (c.name == null) print("1");
+   //         if (c.desc == null) print("2");
+			//if (c.cost == 0) print("3");
+			//if (c.amount == null) print("4");
+			string cardInfo = $"Card {i}:\n" +
+                              $"  Name: {cardList[i].name}\n" +
+                              $"  Desc: {cardList[i].desc}\n" +
+                              $"  Cost: {cardList[i].cost}\n" +
+                              $"  Amount: {string.Join(", ", cardList[i].amount)}\n";
+
+
+			Debug.Log(cardInfo);
+		}
+	}
+
+	void Update()
     {
-       
+        //PrintCards(cards);
+        //print("deck size: " + cards.Count);
     }
+
+    card ParseCardJSON(string json)
+    {
+        if (string.IsNullOrEmpty(json))
+        {
+            Debug.LogError("Card JSON is null or empty.");
+            return null;
+		}
+        card parsedCard = JsonUtility.FromJson<card>(json);
+        return parsedCard;
+	}
 }

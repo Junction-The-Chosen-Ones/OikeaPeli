@@ -9,6 +9,11 @@ public class NetworkDataset
 		public Data data;
 	}
 
+	public class cardRoot
+	{
+		public Card[] data;
+	}
+
 	[System.Serializable]
 	public class Data
 	{
@@ -47,24 +52,24 @@ public class NetworkDataset
 		public string name;
 		public string desc;
 		public int cost;
-		public actionType[] cardType;
+		public cardType[] cardType;
 		public DamageType[] damageType;
-		public int[] Amount;
+		public int[] amount;
 		public string spriteLink;
 
 		// Constructor to initialize all fields. Null array arguments are converted to empty arrays.
-		public Card(string name, string desc, int cost, actionType[] cardType, DamageType[] damageType, int[] Amount, string spriteLink)
+		public Card(string name, string desc, int cost, cardType[] cardType, DamageType[] damageType, int[] Amount, string spriteLink)
 		{
 			this.name = name;
 			this.desc = desc;
 			this.cost = cost;
 			this.cardType = cardType;
 			this.damageType = damageType;
-			this.Amount = Amount;
+			this.amount = Amount;
 			this.spriteLink = spriteLink;
 		}
 	}
-	public enum actionType
+	public enum cardType
 	{
 		attack = 0,
 		defend = 1,
