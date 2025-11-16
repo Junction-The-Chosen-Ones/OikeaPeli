@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class Enemy : MonoBehaviour
 {
     static int MaxHP = 25;
-    static int CurHP = 25;
+    public static int CurHP = 25;
     public int Shield = 0;
     static int Strength = 0;
     static int Endurance = 0;

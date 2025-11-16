@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,16 +15,23 @@ public class MapManager : MonoBehaviour
     int playerAnimCounter = 0;
     int playerAnimCoef= 1;
     int currentEvent = -1;
+    bool battleToggle = true;
 
     public Sprite[] MapIconList;
     public static MapNode[][] nodes; //Array of arrays(columns of nodes)
 
-    public static List<Entity> enemies; // is_enemy = true
-    public static List<DialogEntry> dialogs;
+    public List<Entity> enemies; // is_enemy = true
+    public List<DialogEntry> dialogs; // dialogs
 
-	[SerializeField] private GameObject LevelNode;
+    public static List<Entity> enemiesStatic = new();
+    public static List<DialogEntry> dialogStatic = new();
+
+    [SerializeField] private GameObject LevelNode;
     [SerializeField] private GameObject Pathline;
     [SerializeField] private GameObject MapIcon;
+    [SerializeField] private GameObject BattleButton;
+
+    [SerializeField] TMP_Text textbox;
 
     [HideInInspector] public GameObject playerIcon;
     public class MapNode
@@ -80,6 +88,8 @@ public class MapManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        enemiesStatic.AddRange(enemies.ToArray());
+        dialogStatic.AddRange(dialogs.ToArray());
         if (currentColumn == 0)
         {
             GenerateMap(new Vector3(-6, 1, -1));
@@ -142,11 +152,39 @@ public class MapManager : MonoBehaviour
         {
             switch(currentEvent) //Different event effects
             {
-                case 0:
-                    print("battle");
-                    print($"DEBUG: {RedLane.Count}");
-                    SceneManager.LoadScene("Fight");
-                    currentEvent = -1;
+                case 0: //Regular battle event
+                    if (battleToggle)
+                    {
+                        if (enemiesStatic.Count != 0 && dialogStatic.Count != 0)
+                        {
+                            int TryCounter = 0;
+                            int enemyIndex = 0;
+                            while (true)
+                            {
+                                TryCounter++;
+                                enemyIndex = Random.Range(0, enemiesStatic.Count);
+                                if (!enemiesStatic[enemyIndex].is_boss || TryCounter == 20) { break; }
+                            }
+                            int enemyID = enemiesStatic[enemyIndex].id;
+                            string enemyDialog = "Enemy Approaches, Time To Battle!";
+                            foreach (var dialog in dialogStatic)
+                            {
+                                if (dialog.characterId == $"{enemyID}")
+                                {
+                                    enemyDialog = dialog.content;
+                                }
+                            }
+                            Enemy.CurHP = enemiesStatic[enemyID].health;
+                            textbox.text = enemyDialog;
+                            BattleButton.SetActive(true);
+                        }
+                        else
+                        {
+                            textbox.text = "Enemy Approaches, Time To Battle!";
+                            BattleButton.SetActive(true);
+                        }
+                    }
+                    
                     break;
                 case 1:
                     print("exclamation");
@@ -164,14 +202,46 @@ public class MapManager : MonoBehaviour
                     print("treasure");
                     currentEvent = -1;
                     break;
-                case 5:
-                    print("question");
-                    currentEvent = -1;
+                case 5: //Question -> Boss battle
+                    if (battleToggle)
+                    {
+                        bool foundEnemy = false;
+                        int enemyIndex = 0;
+                        int counter = 0;
+                        foreach (var enemy in enemiesStatic)
+                        {
+                            counter++;
+                            if (enemy.is_boss)
+                            {
+                                enemyIndex = counter;
+                                foundEnemy = true;
+                                Enemy.CurHP = enemy.health;
+                                break;
+                            }
+                        }
+                        string enemyDialog = "Strong Opponent is approaching...";
+                        if (foundEnemy)
+                        {
+                            foreach (var dialog in dialogStatic)
+                            {
+                                if (dialog.characterId == $"{enemiesStatic[enemyIndex]}")
+                                {
+                                    enemyDialog = dialog.content;
+                                }
+                            }
+                        }
+                        textbox.text = enemyDialog;
+                        BattleButton.SetActive(true);
+                    }
+                    else
+                    {
+                        textbox.text = "Enemy Approaches, Time To Battle!";
+                        BattleButton.SetActive(true);
+                    }
                     break;
             }
         }
     }
-
     private void SetNodeColor(GameObject myObject, Color color)
     {
         SpriteRenderer rend = myObject.GetComponent<SpriteRenderer>();
