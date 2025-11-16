@@ -9,8 +9,12 @@ public class Enemy : MonoBehaviour
     public int Shield = 0;
     static int Strength = 0;
     static int Endurance = 0;
+    static string Name = "010111";
     [SerializeField]
     TMP_Text text;
+
+    [SerializeField]
+    TMP_Text nametext;
 
     public void HPHandling(int change)
     {
@@ -74,7 +78,7 @@ public class Enemy : MonoBehaviour
     {
 
         text.text = "Health: " + CurHP.ToString() + "/" + MaxHP.ToString() + "   Shield: " + Shield.ToString() + "   Strength: " + Strength.ToString() + "   Endurance: " + Endurance.ToString();
-
+        nametext.text = Name;
     }
 
     private void Update()
