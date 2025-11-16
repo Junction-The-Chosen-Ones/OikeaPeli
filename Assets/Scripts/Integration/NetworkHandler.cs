@@ -43,7 +43,7 @@ public class NetworkHandler : MonoBehaviour
 			foreach (var card in cards)
 			{
 				Debug.Log($"Card Name: {card.name}, Description: {card.desc}, Cost: {card.cost}");
-				cardManager.cardsFu.Add(card.ToCMCard());
+				cardManager.cards.Add(card.ToCMCard());
 			}
 
 			for (int i = 0; i < 10; i++)
