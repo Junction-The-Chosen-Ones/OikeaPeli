@@ -9,17 +9,17 @@ using UnityEngine.Networking;
 using static NetworkDataset;
 public class NetworkHandler : MonoBehaviour
 {
-	Root networkDataset;
-	Data story;
-	Entity[] entities;
-	Card[] cards;
-	cardRoot cardRoot;
-	List<Card> cardList;
+	static Root networkDataset;
+	static Data story;
+	static Entity[] entities;
+	static Card[] cards;
+	static cardRoot cardRoot;
+	static List<Card> cardList;
 	public CardManager cardManager;
 
-	private string storyJson;
-	private string cardsJson;
-	private bool cardsReady = false;
+	private static string storyJson;
+	private static string cardsJson;
+	private static bool cardsReady = false;
 
 	private void Start()
 	{
@@ -53,6 +53,33 @@ public class NetworkHandler : MonoBehaviour
 			cardsReady = true;
 		}));
 
+		// Fetc entities
+		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/gen/entities", (response) => {
+			var t = JsonConvert.DeserializeObject<fu>(response);
+			var fu = t.entities;
+
+
+			foreach (Entity e in fu)
+			{
+				// Skippa the player
+				if (!e.is_enemy)
+				{
+					continue;
+				}
+				MapManager.enemies.Add(e);
+			}
+		}));
+
+		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/gen/dialogs", (response) =>
+		{
+			var t = JsonConvert.DeserializeObject<ck>(response);
+			var ck = t.dialogs;
+
+			foreach (DialogEntry d in ck)
+			{
+				MapManager.dialogs.Add(d);
+			}
+		}));
 
 		// Fetch full story
 		StartCoroutine(GetRequest("https://backend-new-0wd9.onrender.com/gen/full-story", (response) =>
@@ -61,6 +88,16 @@ public class NetworkHandler : MonoBehaviour
 			Debug.Log("Full Story JSON: " + storyJson);
 
 		}));
+	}
+
+	class fu
+	{
+		public Entity[] entities;
+	}
+
+	class ck
+	{
+		public DialogEntry[] dialogs;
 	}
 
 	private void Update()

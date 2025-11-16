@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+using static NetworkDataset;
 public class MapManager : MonoBehaviour
 {
     static int currentColumn = 0;
@@ -17,7 +18,10 @@ public class MapManager : MonoBehaviour
     public Sprite[] MapIconList;
     public static MapNode[][] nodes; //Array of arrays(columns of nodes)
 
-    [SerializeField] private GameObject LevelNode;
+    public static List<Entity> enemies; // is_enemy = true
+    public static List<DialogEntry> dialogs;
+
+	[SerializeField] private GameObject LevelNode;
     [SerializeField] private GameObject Pathline;
     [SerializeField] private GameObject MapIcon;
 

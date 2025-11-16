@@ -46,6 +46,9 @@ public class NetworkDataset
 	public class DialogEntry
 	{
 		public string id;
+		/// <summary>
+		/// See <see cref="Entity.id"/>
+		/// </summary>
 		public string characterId;
 		public string content;
 	}
