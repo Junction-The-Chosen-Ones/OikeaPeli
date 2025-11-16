@@ -1,13 +1,14 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Enemy : MonoBehaviour
 {
-    int MaxHP = 25;
-    int CurHP = 25;
+    static int MaxHP = 25;
+    static int CurHP = 25;
     public int Shield = 0;
-    int Strength = 0;
-    int Endurance = 0;
+    static int Strength = 0;
+    static int Endurance = 0;
     [SerializeField]
     TMP_Text text;
 
@@ -66,7 +67,7 @@ public class Enemy : MonoBehaviour
     }
     void Death()
     {
-
+        SceneManager.LoadScene("Main");
     }
 
     void battlestart()
