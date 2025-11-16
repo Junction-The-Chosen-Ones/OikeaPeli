@@ -1,14 +1,18 @@
-using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MapManager : MonoBehaviour
 {
     static int currentColumn = 0;
     static int currentNode = 0;
     static int EncounterCounter = 0; //Capped at 3, because image-generation takes time and money
+    static List<Vector2> RedLane = new List<Vector2>(); //A temporary quick fix to map-regen issue
     int playerAnimCounter = 0;
     int playerAnimCoef= 1;
+    int currentEvent = -1;
 
     public Sprite[] MapIconList;
     public static MapNode[][] nodes; //Array of arrays(columns of nodes)
@@ -17,7 +21,7 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject Pathline;
     [SerializeField] private GameObject MapIcon;
 
-    static GameObject playerIcon;
+    [HideInInspector] public GameObject playerIcon;
     public class MapNode
     {
         public int[] linkIndices;
@@ -44,6 +48,13 @@ public class MapManager : MonoBehaviour
             nodeIcon.GetComponent<SpriteRenderer>().sprite = MapIconList[nodeType];
             nodeEffect = new NodeEffect();
             nodeEffect.NodeEffectIcon = nodeIcon;
+            nodeEffect.EffectID = nodeType;
+        }
+        public void Redraw(GameObject levelNode, GameObject MapIcon, Sprite[] MapIconList)
+        {
+            nodeObject = Instantiate(levelNode, nodePos, Quaternion.identity);
+            nodeEffect.NodeEffectIcon = Instantiate(MapIcon, nodePos + new Vector3(0, 0.8f, -1), Quaternion.identity);
+            nodeEffect.NodeEffectIcon.GetComponent<SpriteRenderer>().sprite = MapIconList[nodeEffect.EffectID];
         }
 
         public void DrawLinks(int myColumn, GameObject pathLine)
@@ -57,73 +68,102 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    public class MapState //Currently deprecated; if this is here it means I forgot to delete it
-    {
-        public MapNode[][] mapNodes;
-        public int currentColumnIndex;
-        public int currentNodeIndex;
-        
-        public void SaveMapState(int currentColumn, int currentNode)
-        {
-            mapNodes = nodes;
-            currentColumnIndex = currentColumn;
-            currentNodeIndex = currentNode;
-
-        }
-        public void RestoreMapState()
-        {
-            print("Placeholder");
-        }
-    }
-
     public struct NodeEffect
     {
         public GameObject NodeEffectIcon;
+        public int EffectID;
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        GenerateMap(new Vector3(-6, 1, -1));
+        if (currentColumn == 0)
+        {
+            GenerateMap(new Vector3(-6, 1, -1));
+        }
+        else
+        {
+            print($"Debug: {RedLane.Count}, {RedLane[0]}, {currentColumn}, {currentNode}");
+            DrawNodeMap();
+        }
         playerIcon = Instantiate(MapIcon, new Vector3(0, 0, 0), Quaternion.identity);
-
+        print($"Debug: {playerIcon}, {nodes.Length}, {currentColumn}, {currentNode}");
     }
 
     // Update is called once per frame
     void Update()
     {
         //Player icon control:
+        if(!playerIcon) playerIcon = Instantiate(MapIcon, new Vector3(0, 0, 0), Quaternion.identity);
         playerAnimCounter++;
         if (playerAnimCounter == 60) { playerAnimCounter = 0; playerAnimCoef = -playerAnimCoef; }
         Transform playertransformer = playerIcon.GetComponent<Transform>();
         playertransformer.position = nodes[currentColumn][currentNode].nodePos + new Vector3(0, 0.8f, 0) + new Vector3(0, -0.05f * playerAnimCoef, 0);
 
         //Node click-checker & Protocol
-        for (int i = 0; i < nodes[currentColumn][currentNode].linkIndices.Length; i++)
+        if (currentEvent == -1)
         {
-            int linkedNodeIndex = nodes[currentColumn][currentNode].linkIndices[i];
-            MapNode linkedNode = nodes[currentColumn + 1][linkedNodeIndex];
-            if (linkedNode.nodeObject.GetComponent<BasicLevelClick>().GetClick()) //Click found on a linked nodes
+            for (int i = 0; i < nodes[currentColumn][currentNode].linkIndices.Length; i++)
             {
-                for (int j = 0; j < nodes[currentColumn+1].Length; j++)
+                int linkedNodeIndex = nodes[currentColumn][currentNode].linkIndices[i];
+                MapNode linkedNode = nodes[currentColumn + 1][linkedNodeIndex];
+                if (linkedNode.nodeObject.GetComponent<BasicLevelClick>().GetClick()) //Click found on a linked nodes
                 {
-                    SetNodeColor(nodes[currentColumn+1][j].nodeObject, Color.gray);
-                }
-                currentNode = linkedNodeIndex;
-                currentColumn++;
-                SetNodeColor(nodes[currentColumn][currentNode].nodeObject, Color.red);
-                Destroy(nodes[currentColumn][currentNode].nodeEffect.NodeEffectIcon);
-                if (currentColumn == nodes.Length-1)
-                {
-                    ClearMap();
-                    GenerateMap(new Vector3(-6, 1, -1));
-                }
-                else
-                {
-                    for (int j = 0; j < nodes[currentColumn][currentNode].linkIndices.Length; j++)
+                    for (int j = 0; j < nodes[currentColumn + 1].Length; j++)
                     {
-                        SetNodeColor(nodes[currentColumn + 1][nodes[currentColumn][currentNode].linkIndices[j]].nodeObject, Color.green);
+                        SetNodeColor(nodes[currentColumn + 1][j].nodeObject, Color.gray);
+                    }
+                    currentNode = linkedNodeIndex;
+                    currentColumn++;
+                    SetNodeColor(nodes[currentColumn][currentNode].nodeObject, Color.red);
+                    RedLane.Add(new Vector2(currentColumn, currentNode));
+                    Destroy(nodes[currentColumn][currentNode].nodeEffect.NodeEffectIcon);
+                    currentEvent = nodes[currentColumn][currentNode].nodeEffect.EffectID;
+                    if (currentColumn == nodes.Length - 1)
+                    {
+                        ClearMap();
+                        RedLane.Clear();
+                        GenerateMap(new Vector3(-6, 1, -1));
+                    }
+                    else
+                    {
+                        for (int j = 0; j < nodes[currentColumn][currentNode].linkIndices.Length; j++)
+                        {
+                            SetNodeColor(nodes[currentColumn + 1][nodes[currentColumn][currentNode].linkIndices[j]].nodeObject, Color.green);
+                        }
                     }
                 }
+            }
+        }
+        else
+        {
+            switch(currentEvent) //Different event effects
+            {
+                case 0:
+                    print("battle");
+                    print($"DEBUG: {RedLane.Count}");
+                    SceneManager.LoadScene("Fight");
+                    currentEvent = -1;
+                    break;
+                case 1:
+                    print("exclamation");
+                    currentEvent = -1;
+                    break;
+                case 2:
+                    print("heart");
+                    currentEvent = -1;
+                    break;
+                case 3:
+                    print("money");
+                    currentEvent = -1;
+                    break;
+                case 4:
+                    print("treasure");
+                    currentEvent = -1;
+                    break;
+                case 5:
+                    print("question");
+                    currentEvent = -1;
+                    break;
             }
         }
     }
@@ -225,6 +265,23 @@ public class MapManager : MonoBehaviour
 
     private void DrawNodeMap()
     {
+        if (currentColumn != 0) //This happens only when regenerating map
+        {
+            for (int i = 0; i < nodes.Length; i++)
+            {
+                for (int j = 0; j < nodes[i].Length; j++)
+                {
+                    print("Redrawn");
+                    nodes[i][j].Redraw(LevelNode, MapIcon, MapIconList);
+                }
+            }
+            foreach (Vector2 nodecoords in RedLane)
+            {
+                SetNodeColor(nodes[(int)nodecoords.x][(int)nodecoords.y].nodeObject, Color.red);
+                Destroy(nodes[(int)nodecoords.x][(int)nodecoords.y].nodeEffect.NodeEffectIcon);
+            }
+        }
+        RedLane.Add(new Vector2(0, 0));
         SetNodeColor(nodes[0][0].nodeObject, Color.red);
         Destroy(nodes[0][0].nodeEffect.NodeEffectIcon);
         for (int i = 0; i < nodes[currentColumn][currentNode].linkIndices.Length; i++)
