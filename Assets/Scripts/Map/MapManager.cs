@@ -88,8 +88,6 @@ public class MapManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        enemiesStatic.AddRange(enemies.ToArray());
-        dialogStatic.AddRange(dialogs.ToArray());
         if (currentColumn == 0)
         {
             GenerateMap(new Vector3(-6, 1, -1));
@@ -106,8 +104,10 @@ public class MapManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (enemies.Count != 0) enemiesStatic.AddRange(enemies.ToArray());
+        if (dialogs.Count != 0) dialogStatic.AddRange(dialogs.ToArray());
         //Player icon control:
-        if(!playerIcon) playerIcon = Instantiate(MapIcon, new Vector3(0, 0, 0), Quaternion.identity);
+        if (!playerIcon) playerIcon = Instantiate(MapIcon, new Vector3(0, 0, 0), Quaternion.identity);
         playerAnimCounter++;
         if (playerAnimCounter == 60) { playerAnimCounter = 0; playerAnimCoef = -playerAnimCoef; }
         Transform playertransformer = playerIcon.GetComponent<Transform>();
@@ -183,6 +183,7 @@ public class MapManager : MonoBehaviour
                             textbox.text = "Enemy Approaches, Time To Battle!";
                             BattleButton.SetActive(true);
                         }
+                        battleToggle = false;
                     }
                     
                     break;
@@ -233,11 +234,7 @@ public class MapManager : MonoBehaviour
                         textbox.text = enemyDialog;
                         BattleButton.SetActive(true);
                     }
-                    else
-                    {
-                        textbox.text = "Enemy Approaches, Time To Battle!";
-                        BattleButton.SetActive(true);
-                    }
+                    battleToggle = false;
                     break;
             }
         }

@@ -44,7 +44,7 @@ public class NetworkHandler : MonoBehaviour
             foreach (var card in cards)
 			{
 				Debug.Log($"Card Name: {card.name}, Description: {card.desc}, Cost: {card.cost}, Amount: {card.amount[0]}, Cardtype: {card.cardType}");
-				cardManager.cardsFu.Add(card.ToCMCard());
+				cardManager.cards.Add(card.ToCMCard());
             }
 			
 			for (int i = 0; i < 10; i++)
@@ -62,7 +62,7 @@ public class NetworkHandler : MonoBehaviour
 			var fu = t.entities;
 
 
-			foreach (Entity e in fu)
+            foreach (Entity e in fu)
 			{
 				// Skippa the player
 				if (!e.is_enemy)
@@ -77,7 +77,6 @@ public class NetworkHandler : MonoBehaviour
 		{
 			var t = JsonConvert.DeserializeObject<ck>(response);
 			var ck = t.dialogs;
-
 			foreach (var d in ck)
 			{
 				Debug.LogError("Loading dialog: " + d.ToString());
