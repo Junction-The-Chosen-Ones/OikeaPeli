@@ -11,8 +11,13 @@ public class NetworkDataset
 
 	public class cardRoot
 	{
-		public Card[] data;
+		public Data[] data;
 	}
+	public class cardData
+	{
+		public Card[] cards;
+	}
+
 
 	[System.Serializable]
 	public class Data
@@ -34,6 +39,7 @@ public class NetworkDataset
 		public int attack;
 		public int defense;
 		public int health;
+		public bool is_boss;
 	}
 
 	[System.Serializable]
@@ -47,13 +53,13 @@ public class NetworkDataset
 
 
 	[System.Serializable]
-	public struct Card
+	public class Card
 	{
 		public string name;
 		public string desc;
 		public int cost;
-		public cardType[] cardType;
-		public DamageType[] damageType;
+		public cardType[]? cardType;
+		public DamageType[]? damageType;
 		public int[] amount;
 		public string spriteLink;
 
@@ -67,6 +73,18 @@ public class NetworkDataset
 			this.damageType = damageType;
 			this.amount = Amount;
 			this.spriteLink = spriteLink;
+		}
+
+		public CardManager.card ToCMCard()
+		{
+			return new CardManager.card(
+				this.name,
+				this.desc,
+				this.cost,
+				this.cardType ?? new cardType[] { },
+				this.damageType ?? new DamageType[] { },
+				this.amount
+			);
 		}
 	}
 	public enum cardType

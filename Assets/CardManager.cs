@@ -1,31 +1,18 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using static NetworkDataset;
 public class CardManager : MonoBehaviour
 {
 
 
-    public List<card> cards = new List<card>{ };
+    public static List<card> cards = new List<card>{ };
     public int[] hand = new int[6] {0,0,0,0,0,0};
-    public GameObject[] cardobjects;
-    public int[] cardpool = new int[] { 1, 2, 3 };
+    public static GameObject[] cardobjects;
+    public List<int> cardpool = new() { };
     public UIHandler uihandler;
     GameObject UICanvas;
 
-    public enum cardType
-    {
-        attack = 0,
-        defend = 1,
-        heal = 2,
-        special = 3,
-    }
-    public enum DamageType
-    {
-        physical = 0,
-        elemental = 1,
-        holy = 2,
-        dark = 3
-    }
     public class card
     {
         public string name;
@@ -135,7 +122,7 @@ public class CardManager : MonoBehaviour
         {
             if(hand[i] == 0)
             {
-                hand[i] = cardpool[Random.Range(1, cardpool.Length)];
+                hand[i] = cardpool[Random.Range(1, cardpool.Count)];
                 break;
             }
         }
@@ -211,4 +198,11 @@ public class CardManager : MonoBehaviour
         card parsedCard = JsonUtility.FromJson<card>(json);
         return parsedCard;
 	}
+
+    public void AddRandomCardToPool()
+    {
+        int _rcount = cards.Count;
+        int _r = Random.Range(1, _rcount);
+        cardpool.Add(_r);
+    }
 }
