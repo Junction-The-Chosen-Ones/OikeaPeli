@@ -12,7 +12,22 @@ public class PlayerStats : MonoBehaviour
     TMP_Text text;
 
     public void HPHandling(int change) {
-        CurHP += change;
+        if(change < 0)
+        {
+            if ((change*-1) <= Shield)
+            {
+                Shield += change;
+
+            }
+            else
+            {
+                CurHP += change+Shield;
+            }
+        }
+        else{
+            CurHP += change;
+        }
+        
         if(CurHP > MaxHP)
         {
             CurHP = MaxHP;
