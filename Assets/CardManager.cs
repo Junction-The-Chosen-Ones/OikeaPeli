@@ -46,7 +46,7 @@ public class CardManager : MonoBehaviour
 
     public void CardProq(int card)
     {
-        gameObject.GetComponentInChildren<PlayerStats>().HPHandling(cards[card].cost*-1); 
+        gameObject.GetComponentInChildren<PlayerStats>().HPHandling(Mathf.RoundToInt(((cards[card].cost*-1)/3))); 
         for(int i = 0; i < cards[i].cardtype.Length; i++)
         {
             switch (cards[card].cardtype[i])
