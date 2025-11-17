@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -175,6 +174,8 @@ public class MapManager : MonoBehaviour
                                 }
                             }
                             Enemy.CurHP = enemiesStatic[enemyID].health;
+                            Enemy.MaxHP = enemiesStatic[enemyID].health;
+                            Enemy.Name = enemiesStatic[enemyID].name;
                             textbox.text = enemyDialog;
                             BattleButton.SetActive(true);
                         }

@@ -89,6 +89,7 @@ public class CardManager : MonoBehaviour
 					break;
 				case cardType.defend:
 					gameObject.GetComponentInChildren<Enemy>().Shield += (cards[card].amount[i]);
+					gameObject.GetComponentInChildren<Enemy>().UpdateText();
 					break;
 				case cardType.heal:
 					gameObject.GetComponentInChildren<Enemy>().HPHandling(cards[card].amount[i]);

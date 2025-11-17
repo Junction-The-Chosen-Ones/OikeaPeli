@@ -4,12 +4,12 @@ using UnityEngine.SceneManagement;
 
 public class Enemy : MonoBehaviour
 {
-    static int MaxHP = 25;
+    public static int MaxHP = 25;
     public static int CurHP = 25;
     public int Shield = 0;
     static int Strength = 0;
     static int Endurance = 0;
-    static string Name = "010111";
+    public static string Name = "010111";
     [SerializeField]
     TMP_Text text;
 
@@ -74,7 +74,7 @@ public class Enemy : MonoBehaviour
         UpdateText();
     }
 
-    void UpdateText()
+    public void UpdateText()
     {
 
         text.text = "Health: " + CurHP.ToString() + "/" + MaxHP.ToString() + "   Shield: " + Shield.ToString() + "   Strength: " + Strength.ToString() + "   Endurance: " + Endurance.ToString();
